@@ -1,6 +1,6 @@
 {
-  "name": "gulp-sloc",
-  "version": "1.0.4",
+  "name": "gulp-sloc2",
+  "version": "1.0.0",
   "description": "A port of the grunt-sloc plugin for gulp",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://git@github.com:oddjobsman/gulp-sloc.git"
+    "url": "ssh://git@github.com:pnarielwala/gulp-sloc2.git"
   },
   "engines": {
     "node": ">=0.9"
@@ -18,32 +18,32 @@
     "gulpplugin",
     "sloc"
   ],
-  "author": "oddjobsman",
+  "author": "pnarielwala",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/oddjobsman/gulp-sloc/issues"
+    "url": "https://github.com/pnarielwala/gulp-sloc2/issues"
   },
-  "homepage": "https://github.com/oddjobsman/gulp-sloc",
+  "homepage": "https://github.com/pnarielwala/gulp-sloc2",
   "dependencies": {
     "mkdirp": "^0.4.0",
     "lodash": "^2.4.1",
-    "sloc": "0.1.1",
+    "sloc": "^0.1.10",
     "event-stream": "^3.1.2",
     "gulp-util": "^2.2.14"
   },
   "devDependencies": {
-    "strip-ansi": "^0.2.0",
-    "mocha-lcov-reporter": "0.0.1",
-    "expect.js": "^0.3.1",
+    "coveralls": "^2.10.0",
     "event-stream": "^3.1.2",
-    "jshint-stylish": "^0.1.5",
+    "expect.js": "^0.3.1",
+    "gulp": "^3.6.2",
+    "gulp-jshint": "^1.5.5",
+    "gulp-load-plugins": "^0.5.0",
     "gulp-mocha": "^0.4.1",
     "gulp-plumber": "^0.6.1",
-    "mocha": "^1.18.2",
     "istanbul": "^0.2.7",
-    "gulp-load-plugins": "^0.5.0",
-    "coveralls": "^2.10.0",
-    "gulp-jshint": "^1.5.5",
-    "gulp": "^3.6.2"
+    "jshint-stylish": "^0.1.5",
+    "mocha": "^1.18.2",
+    "mocha-lcov-reporter": "0.0.1",
+    "strip-ansi": "^0.2.0"
   }
 }
