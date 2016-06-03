@@ -18,10 +18,10 @@
     "gulpplugin",
     "sloc"
   ],
-  "author": "oddjobsman",
+  "author": "pnarielwala",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/oddjobsman/gulp-sloc/issues"
+    "url": "https://github.com/pnarielwala/gulp-sloc2/issues"
   },
   "homepage": "https://github.com/pnarielwala/gulp-sloc2",
   "dependencies": {
