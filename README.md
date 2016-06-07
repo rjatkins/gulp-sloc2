@@ -14,7 +14,7 @@ npm install --save-dev gulp-sloc
 Then, add it to your `gulpfile.js`:
 
 ```javascript
-var sloc = require('gulp-sloc');
+var sloc = require('gulp-sloc2');
 
 gulp.task('sloc', function(){
   gulp.src(['scripts/*.js'])
@@ -57,7 +57,7 @@ Default: `stdout`
 It will generate a JSON file with the SLOC analysis results and sends it further downstream. Use with the `reportFile` option if you want to customize the file name. You may want to pipe to the `gulp.dest()` method to write it out to specified folder. Example:
 
 ```javascript
-var sloc = require('gulp-sloc');
+var sloc = require('gulp-sloc2');
 
 gulp.task('sloc', function(){
   gulp.src(['lib/**/*.js'])
@@ -81,7 +81,7 @@ Default: `sloc.json`
  The name of the file which would contain you'd like to output the JSON file. Use with the `json` as `reportType`. Ignored if used with the `stdout` report type. Example:
 
 ``` js
-var sloc = require('gulp-sloc');
+var sloc = require('gulp-sloc2');
 
 gulp.task('sloc', function(){
   gulp.src(['./test/**/*.js'])
