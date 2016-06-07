@@ -3,13 +3,6 @@ gulp-sloc
 
 A port of the [grunt-sloc](https://github.com/rhiokim/grunt-sloc) plugin for gulp with some minor changes.
 
-[![build status](https://secure.travis-ci.org/oddjobsman/gulp-sloc.png)](http://travis-ci.org/oddjobsman/gulp-sloc)
-[![dependency status](https://david-dm.org/oddjobsman/gulp-sloc.png)](https://david-dm.org/oddjobsman/gulp-sloc)
-[![Coverage Status](https://coveralls.io/repos/oddjobsman/gulp-sloc/badge.png)](https://coveralls.io/r/oddjobsman/gulp-sloc)
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/oddjobsman/gulp-sloc/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
-[![NPM](https://nodei.co/npm/gulp-sloc.png?stars=true&downloads=true)](https://nodei.co/npm/gulp-sloc/)
-
 ## Usage
 
 First install the `gulp-sloc` plugin as a development dependency:
@@ -78,7 +71,7 @@ gulp.task('sloc', function(){
 Would output the following in the file `./reports/sloc.json`:
 
 ``` js
-{"loc":138,"sloc":100,"cloc":5,"scloc":5,"mcloc":0,"nloc":33,"file":2}
+{"total":138,"source":100,"comment":5,"single":5,"block":0,"empty":33,"file":2}
 ```
 
 #### options.reportFile
