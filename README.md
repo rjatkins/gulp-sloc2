@@ -1,4 +1,4 @@
-gulp-sloc
+gulp-sloc2
 =========
 
 A port of the [grunt-sloc](https://github.com/rhiokim/grunt-sloc) plugin for gulp with some minor changes.
