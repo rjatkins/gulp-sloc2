@@ -8,7 +8,7 @@ A port of the [grunt-sloc](https://github.com/rhiokim/grunt-sloc) plugin for gul
 First install the `gulp-sloc` plugin as a development dependency:
 
 ```shell
-npm install --save-dev gulp-sloc
+npm install --save-dev gulp-sloc2
 ```
 
 Then, add it to your `gulpfile.js`:
