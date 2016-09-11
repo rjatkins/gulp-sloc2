@@ -23,23 +23,23 @@ function makeFakeFile(filePath, contents) {
 }
 
 function validateOutput(lines, counters, strict) {
-  expect(lines[0]).to.be(util.format('[%s] -------------------------------', colors.green('gulp')));
-  expect(lines[1]).to.be(util.format('[%s]         physical lines : %s', colors.green('gulp'), colors.green(String(counters.loc))));
-  expect(lines[2]).to.be(util.format('[%s]   lines of source code : %s', colors.green('gulp'), colors.green(String(counters.sloc))));
-  expect(lines[3]).to.be(util.format('[%s]          total comment : %s', colors.green('gulp'), colors.cyan(String(counters.cloc))));
-  expect(lines[4]).to.be(util.format('[%s]             singleline : %s', colors.green('gulp'), String(counters.scloc)));
-  expect(lines[5]).to.be(util.format('[%s]              multiline : %s', colors.green('gulp'), String(counters.mcloc)));
-  expect(lines[6]).to.be(util.format('[%s]                  empty : %s', colors.green('gulp'), colors.red(String(counters.nloc))));
-  expect(lines[7]).to.be(util.format('[%s] ', colors.green('gulp')));
-  expect(lines[8]).to.be(util.format('[%s]   number of files read : %s', colors.green('gulp'), colors.green(String(counters.file))));
+  expect(lines[0]).to.contain('] -------------------------------');
+  expect(lines[1]).to.contain(util.format(']         physical lines : %s', colors.green(String(counters.loc))));
+  expect(lines[2]).to.contain(util.format(']   lines of source code : %s', colors.green(String(counters.sloc))));
+  expect(lines[3]).to.contain(util.format(']          total comment : %s', colors.cyan(String(counters.cloc))));
+  expect(lines[4]).to.contain(util.format(']             singleline : %s', String(counters.scloc)));
+  expect(lines[5]).to.contain(util.format(']              multiline : %s', String(counters.mcloc)));
+  expect(lines[6]).to.contain(util.format(']                  empty : %s', colors.red(String(counters.nloc))));
+  expect(lines[7]).to.contain('] ');
+  expect(lines[8]).to.contain(util.format(']   number of files read : %s', colors.green(String(counters.file))));
 
   if (strict) {
-    expect(lines[9]).to.be(util.format('[%s] %s', colors.green('gulp'), colors.red('           strict mode ')));
+    expect(lines[9]).to.contain(util.format(' %s', colors.red('           strict mode ')));
   } else {
-    expect(lines[9]).to.be(util.format('[%s] %s', colors.green('gulp'), colors.yellow('         tolerant mode ')));
+    expect(lines[9]).to.contain(util.format('] %s', colors.yellow('         tolerant mode ')));
   }
 
-  expect(lines[10]).to.be(util.format('[%s] -------------------------------', colors.green('gulp')));
+  expect(lines[10]).to.contain('] -------------------------------');
 }
 
 describe('gulp-sloc', function () {
@@ -137,7 +137,7 @@ describe('gulp-sloc', function () {
       var stream = sloc({
         reportType: 'json'
       });
-      var expectedResults = {loc: 2, sloc: 2, cloc: 0, scloc: 0, mcloc: 0, nloc: 0, file: 2};
+      var expectedResults = {total: 2, source: 2, comment: 0, single: 0, block: 0, empty: 0, file: 2};
 
       stream.on('data', function (file) {
         expect(path.basename(file.path)).to.be('sloc.json');
@@ -162,7 +162,7 @@ describe('gulp-sloc', function () {
         reportType: 'json',
         reportFile: 'all.json'
       });
-      var expectedResults = {loc: 2, sloc: 2, cloc: 0, scloc: 0, mcloc: 0, nloc: 0, file: 2};
+      var expectedResults = {total: 2, source: 2, comment: 0, single: 0, block: 0, empty: 0, file: 2};
 
       stream.on('data', function (file) {
         expect(path.basename(file.path)).to.be('all.json');
@@ -187,7 +187,7 @@ describe('gulp-sloc', function () {
         tolerant: true,
         reportType: 'json'
       });
-      var expectedResults = {loc: 3, sloc: 3, cloc: 0, scloc: 0, mcloc: 0, nloc: 0, file: 3};
+      var expectedResults = {total: 3, source: 3, comment: 0, single: 0, block: 0, empty: 0, file: 3};
 
       stream.on('data', function (file) {
         expect(path.basename(file.path)).to.be('sloc.json');
@@ -213,7 +213,7 @@ describe('gulp-sloc', function () {
         reportType: 'json',
         reportFile: 'all.json'
       });
-      var expectedResults = {loc: 3, sloc: 3, cloc: 0, scloc: 0, mcloc: 0, nloc: 0, file: 3};
+      var expectedResults = {total: 3, source: 3, comment: 0, single: 0, block: 0, empty: 0, file: 3};
 
       stream.on('data', function (file) {
         expect(path.basename(file.path)).to.be('all.json');
