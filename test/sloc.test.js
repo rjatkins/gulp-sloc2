@@ -34,10 +34,12 @@ function validateOutputLine(metric, line, value) {
   expect(line).to.contain(expectedSubstring);
 }
 
-function validateOutput(lines, counters, strict, showMode) {
-  if (showMode === undefined) {
-    showMode = true;
-  }
+function validateOutput(lines, counters, strict, elements) {
+  elements = _.extend({
+    mode: true,
+    before: '-------------------------------',  
+    after: '-------------------------------'  
+  }, elements || {});
 
   // all metrics in expected order - only ones that should be present will be checked
   var metrics = [
@@ -75,9 +77,14 @@ function validateOutput(lines, counters, strict, showMode) {
     }
   ];
 
-  expect(lines[0]).to.contain('] -------------------------------');
 
-  var lineIndex = 1;
+  var lineIndex = 0;
+    
+  if (elements.before) {
+    expect(lines[lineIndex]).to.contain('] ' + elements.before);
+    lineIndex += 1;
+  }
+
   _.each(metrics, function (metric) {
     // ensure that this metric is expected
     if (!counters.hasOwnProperty(metric.name)) {
@@ -90,7 +97,7 @@ function validateOutput(lines, counters, strict, showMode) {
   });
 
   // if mode or no. of files should be printed
-  if (showMode || counters.hasOwnProperty('file')) {
+  if (elements || counters.hasOwnProperty('file')) {
     // skip over this line - assertion is always true, so pointless
     // expect(lines[lineIndex]).to.contain('] ');
     lineIndex += 1;
@@ -106,7 +113,7 @@ function validateOutput(lines, counters, strict, showMode) {
     lineIndex += 1;
   }
 
-  if (showMode) {
+  if (elements.mode) {
     if (strict) {
       expect(lines[lineIndex]).to.contain(util.format(' %s', colors.red('           strict mode ')));
     } else {
@@ -115,7 +122,10 @@ function validateOutput(lines, counters, strict, showMode) {
     lineIndex += 1;
   }
 
-  expect(lines[lineIndex]).to.contain('] -------------------------------');
+  if (elements.after) {
+    expect(lines[lineIndex]).to.contain('] ' + elements.after);
+    lineIndex += 1;
+  }
 }
 
 describe('gulp-sloc', function () {
@@ -335,8 +345,11 @@ describe('gulp-sloc', function () {
     });
 
     it('should not print mode if disabled', function (done) {
+      var reportElements = {
+        mode: false
+      };
       var stream = sloc({
-        reportMode: false
+        reportElements: reportElements
       });
       var restoreStdout;
 
@@ -344,7 +357,7 @@ describe('gulp-sloc', function () {
         var lines = writtenValue.split('\n');
 
         try {
-          validateOutput(lines, {total: 1, source: 1, comment: 0, single: 0, block: 0, mixed: 0, empty: 0, file: 1}, true, false);
+          validateOutput(lines, {total: 1, source: 1, comment: 0, single: 0, block: 0, mixed: 0, empty: 0, file: 1}, true, reportElements);
 
           restoreStdout();
           done();
@@ -360,8 +373,11 @@ describe('gulp-sloc', function () {
     });
 
     it('should not print mode or file count if disabled', function (done) {
+      var reportElements = {
+        mode: false
+      };
       var stream = sloc({
-        reportMode: false,
+        reportElements: reportElements,
         metrics: ['total']
       });
       var restoreStdout;
@@ -370,7 +386,123 @@ describe('gulp-sloc', function () {
         var lines = writtenValue.split('\n');
 
         try {
-          validateOutput(lines, {total: 1}, true, false);
+          validateOutput(lines, {total: 1}, true, reportElements);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should not print line after report if disabled', function (done) {
+      var reportElements = {
+        after: false
+      };
+      var stream = sloc({
+        reportElements: reportElements,
+        metrics: ['total']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1}, true, reportElements);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should print customized line after report', function (done) {
+      var reportElements = {
+        after: '--after--'
+      };
+      var stream = sloc({
+        reportElements: reportElements,
+        metrics: ['total']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1}, true, reportElements);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should not print line before report if disabled', function (done) {
+      var reportElements = {
+        before: false
+      };
+      var stream = sloc({
+        reportElements: reportElements,
+        metrics: ['total']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1}, true, reportElements);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should print customized line before report', function (done) {
+      var reportElements = {
+        before: '--before--'
+      };
+      var stream = sloc({
+        reportElements: reportElements,
+        metrics: ['total']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1}, true, reportElements);
 
           restoreStdout();
           done();

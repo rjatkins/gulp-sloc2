@@ -16,9 +16,14 @@ function gulpSloc(options) {
     tolerant: false,
     reportType: 'stdout',
     reportFile: 'sloc.json',
-    reportMode: true,
+    reportElements: {},
     metrics: ['total', 'source', 'comment', 'single', 'block', 'mixed', 'empty', 'file']
   }, (options || {}));
+  options.reportElements = _.extend({
+    mode: true,
+    before: '-------------------------------',
+    after: '-------------------------------'
+  }, options.reportElements);  
 
   if (options.reportType === 'json' && _.isEmpty(options.reportFile)) {
     throw new gutil.PluginError('gulp-sloc', 'Invalid report file. Provide a valid file name for reportFile in options.');
@@ -69,7 +74,10 @@ function gulpSloc(options) {
       counters = _.pick(counters, options.metrics);
       /*jshint validthis: true*/
 
-      log('-------------------------------');
+      if (options.reportElements.before) {
+        log(options.reportElements.before);
+      }
+      
       if ('total' in counters)    log('        physical lines : ' + colors.green(String(counters.total)));
       if ('source' in counters)   log('  lines of source code : ' + colors.green(String(counters.source)));
       if ('comment' in counters)  log('         total comment : ' + colors.cyan(String(counters.comment)));
@@ -77,10 +85,10 @@ function gulpSloc(options) {
       if ('block' in counters)    log('                 block : ' + String(counters.block));
       if ('mixed' in counters)    log('                 mixed : ' + String(counters.mixed));
       if ('empty' in counters)    log('                 empty : ' + colors.red(String(counters.empty)));
-      if (options.reportMode || ('file' in counters)) log('');
+      if (options.reportElements || ('file' in counters)) log('');
       if ('file' in counters)     log('  number of files read : ' + colors.green(String(counters.file)));
 
-      if (options.reportMode) {
+      if (options.reportElements.mode) {
         var modeMessage = options.tolerant ?
           colors.yellow('         tolerant mode ') :
           colors.red('           strict mode ');
@@ -88,7 +96,9 @@ function gulpSloc(options) {
         log(modeMessage);
       }
 
-      log('-------------------------------');
+      if (options.reportElements.after) {
+        log(options.reportElements.after);
+      }
 
       this.emit('end');
     }
