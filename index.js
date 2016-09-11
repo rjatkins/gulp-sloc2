@@ -85,7 +85,7 @@ function gulpSloc(options) {
       if ('block' in counters)    log('                 block : ' + String(counters.block));
       if ('mixed' in counters)    log('                 mixed : ' + String(counters.mixed));
       if ('empty' in counters)    log('                 empty : ' + colors.red(String(counters.empty)));
-      if (options.reportElements || ('file' in counters)) log('');
+      if (options.reportElements.mode || ('file' in counters)) log('');
       if ('file' in counters)     log('  number of files read : ' + colors.green(String(counters.file)));
 
       if (options.reportElements.mode) {

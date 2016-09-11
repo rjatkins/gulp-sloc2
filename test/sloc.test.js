@@ -97,7 +97,7 @@ function validateOutput(lines, counters, strict, elements) {
   });
 
   // if mode or no. of files should be printed
-  if (elements || counters.hasOwnProperty('file')) {
+  if (elements.mode || counters.hasOwnProperty('file')) {
     // skip over this line - assertion is always true, so pointless
     // expect(lines[lineIndex]).to.contain('] ');
     lineIndex += 1;
