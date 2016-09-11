@@ -16,6 +16,7 @@ function gulpSloc(options) {
     tolerant: false,
     reportType: 'stdout',
     reportFile: 'sloc.json',
+    reportMode: true,
     metrics: ['total', 'source', 'comment', 'single', 'block', 'mixed', 'empty', 'file']
   }, (options || {}));
 
@@ -76,14 +77,17 @@ function gulpSloc(options) {
       if ('block' in counters)    log('                 block : ' + String(counters.block));
       if ('mixed' in counters)    log('                 mixed : ' + String(counters.mixed));
       if ('empty' in counters)    log('                 empty : ' + colors.red(String(counters.empty)));
-      log('');
+      if (options.reportMode || ('file' in counters)) log('');
       if ('file' in counters)     log('  number of files read : ' + colors.green(String(counters.file)));
 
-      var modeMessage = options.tolerant ?
-                    colors.yellow('         tolerant mode ') :
-                    colors.red('           strict mode ');
+      if (options.reportMode) {
+        var modeMessage = options.tolerant ?
+          colors.yellow('         tolerant mode ') :
+          colors.red('           strict mode ');
 
-      log(modeMessage);
+        log(modeMessage);
+      }
+
       log('-------------------------------');
 
       this.emit('end');

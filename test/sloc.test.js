@@ -34,7 +34,11 @@ function validateOutputLine(metric, line, value) {
   expect(line).to.contain(expectedSubstring);
 }
 
-function validateOutput(lines, counters, strict) {
+function validateOutput(lines, counters, strict, showMode) {
+  if (showMode === undefined) {
+    showMode = true;
+  }
+
   // all metrics in expected order - only ones that should be present will be checked
   var metrics = [
     {
@@ -85,11 +89,14 @@ function validateOutput(lines, counters, strict) {
     lineIndex += 1;
   });
 
-  // skip over this line - assertion is always true, so pointless
-  // expect(lines[lineIndex]).to.contain('] ');
-  lineIndex += 1;
+  // if mode or no. of files should be printed
+  if (showMode || counters.hasOwnProperty('file')) {
+    // skip over this line - assertion is always true, so pointless
+    // expect(lines[lineIndex]).to.contain('] ');
+    lineIndex += 1;
+  }
 
-  // file is special because there's an empty line before it
+  // 'file' metric is special because there's an empty line before it
   if (counters.hasOwnProperty('file')) {
     validateOutputLine({
       name: 'file',
@@ -99,12 +106,14 @@ function validateOutput(lines, counters, strict) {
     lineIndex += 1;
   }
 
-  if (strict) {
-    expect(lines[lineIndex]).to.contain(util.format(' %s', colors.red('           strict mode ')));
-  } else {
-    expect(lines[lineIndex]).to.contain(util.format('] %s', colors.yellow('         tolerant mode ')));
+  if (showMode) {
+    if (strict) {
+      expect(lines[lineIndex]).to.contain(util.format(' %s', colors.red('           strict mode ')));
+    } else {
+      expect(lines[lineIndex]).to.contain(util.format('] %s', colors.yellow('         tolerant mode ')));
+    }
+    lineIndex += 1;
   }
-  lineIndex += 1;
 
   expect(lines[lineIndex]).to.contain('] -------------------------------');
 }
@@ -311,6 +320,57 @@ describe('gulp-sloc', function () {
 
         try {
           validateOutput(lines, {total: 1, source: 1}, true);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should not print mode if disabled', function (done) {
+      var stream = sloc({
+        reportMode: false
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1, source: 1, comment: 0, single: 0, block: 0, mixed: 0, empty: 0, file: 1}, true, false);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
+      stream.end();
+    });
+
+    it('should not print mode or file count if disabled', function (done) {
+      var stream = sloc({
+        reportMode: false,
+        metrics: ['total']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1}, true, false);
 
           restoreStdout();
           done();
