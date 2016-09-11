@@ -22,25 +22,91 @@ function makeFakeFile(filePath, contents) {
   });
 }
 
-function validateOutput(lines, counters, strict) {
-  expect(lines[0]).to.contain('] -------------------------------');
-  expect(lines[1]).to.contain(util.format(']         physical lines : %s', colors.green(String(counters.total))));
-  expect(lines[2]).to.contain(util.format(']   lines of source code : %s', colors.green(String(counters.source))));
-  expect(lines[3]).to.contain(util.format(']          total comment : %s', colors.cyan(String(counters.comment))));
-  expect(lines[4]).to.contain(util.format(']            single-line : %s', String(counters.single)));
-  expect(lines[5]).to.contain(util.format(']                  block : %s', String(counters.block)));
-  expect(lines[6]).to.contain(util.format(']                  mixed : %s', String(counters.mixed)));
-  expect(lines[7]).to.contain(util.format(']                  empty : %s', colors.red(String(counters.empty))));
-  expect(lines[8]).to.contain('] ');
-  expect(lines[9]).to.contain(util.format(']   number of files read : %s', colors.green(String(counters.file))));
+function validateOutputLine(metric, line, value) {
+  // prepare expected value based on metric's spec
+  var expectedSubstringFormat = '  ' + metric.label + ' : %s';
+  if (metric.hasOwnProperty('filter')) {
+    value = metric.filter(value);
+  }
+  var expectedSubstring = util.format(expectedSubstringFormat, value);
 
-  if (strict) {
-    expect(lines[10]).to.contain(util.format(' %s', colors.red('           strict mode ')));
-  } else {
-    expect(lines[10]).to.contain(util.format('] %s', colors.yellow('         tolerant mode ')));
+  // assert
+  expect(line).to.contain(expectedSubstring);
+}
+
+function validateOutput(lines, counters, strict) {
+  // all metrics in expected order - only ones that should be present will be checked
+  var metrics = [
+    {
+      name: 'total',
+      label: 'physical lines',
+      filter: colors.green
+    },
+    {
+      name: 'source',
+      label: 'lines of source code',
+      filter: colors.green
+    },
+    {
+      name: 'comment',
+      label: 'total comment',
+      filter: colors.cyan
+    },
+    {
+      name: 'single',
+      label: 'single-line'
+    },
+    {
+      name: 'block',
+      label: 'block'
+    },
+    {
+      name: 'mixed',
+      label: 'mixed'
+    },
+    {
+      name: 'empty',
+      label: 'empty',
+      filter: colors.red
+    }
+  ];
+
+  expect(lines[0]).to.contain('] -------------------------------');
+
+  var lineIndex = 1;
+  _.each(metrics, function (metric) {
+    // ensure that this metric is expected
+    if (!counters.hasOwnProperty(metric.name)) {
+      return;
+    }
+
+    // assert and continue
+    validateOutputLine(metric, lines[lineIndex], counters[metric.name]);
+    lineIndex += 1;
+  });
+
+  // skip over this line - assertion is always true, so pointless
+  // expect(lines[lineIndex]).to.contain('] ');
+  lineIndex += 1;
+
+  // file is special because there's an empty line before it
+  if (counters.hasOwnProperty('file')) {
+    validateOutputLine({
+      name: 'file',
+      label: 'number of files read',
+      filter: colors.green
+    }, lines[lineIndex], counters.file);
+    lineIndex += 1;
   }
 
-  expect(lines[11]).to.contain('] -------------------------------');
+  if (strict) {
+    expect(lines[lineIndex]).to.contain(util.format(' %s', colors.red('           strict mode ')));
+  } else {
+    expect(lines[lineIndex]).to.contain(util.format('] %s', colors.yellow('         tolerant mode ')));
+  }
+  lineIndex += 1;
+
+  expect(lines[lineIndex]).to.contain('] -------------------------------');
 }
 
 describe('gulp-sloc', function () {
@@ -85,7 +151,7 @@ describe('gulp-sloc', function () {
       stream.on('error', function () {
         console.log('Error!');
       });
-    
+
       stream.on('end', function () {
         var lines = writtenValue.split('\n');
 
@@ -231,6 +297,31 @@ describe('gulp-sloc', function () {
       stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
       stream.write(makeFakeFile('/a/b/boo.js', 'var a = 10, b= 20;'));
       stream.write(makeFakeFile('/a/b/moo.bak', 'var a = 10, b= 20;'));   // this file should not be ignored
+      stream.end();
+    });
+
+    it('should allow for filtering of displayed metrics', function (done) {
+      var stream = sloc({
+          metrics: ['total', 'source']
+      });
+      var restoreStdout;
+
+      stream.on('end', function () {
+        var lines = writtenValue.split('\n');
+
+        try {
+          validateOutput(lines, {total: 1, source: 1}, true);
+
+          restoreStdout();
+          done();
+        } catch (e) {
+          restoreStdout();
+          return done(e);
+        }
+      });
+
+      restoreStdout = interceptStdout(updateConsoleValue);
+      stream.write(makeFakeFile('/a/b/foo.js', 'var a = 10;'));
       stream.end();
     });
 
