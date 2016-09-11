@@ -24,7 +24,7 @@ function gulpSloc(options) {
 
   return (function () {
 
-    var counters = { total: 0, source: 0, comment: 0, single: 0, block: 0, empty: 0, file: 0 };
+    var counters = { total: 0, source: 0, comment: 0, single: 0, block: 0, mixed: 0,empty: 0, file: 0 };
 
     function writeJsonReport() {
       /*jshint validthis: true*/
@@ -69,8 +69,9 @@ function gulpSloc(options) {
       log('        physical lines : ' + colors.green(String(counters.total)));
       log('  lines of source code : ' + colors.green(String(counters.source)));
       log('         total comment : ' + colors.cyan(String(counters.comment)));
-      log('            singleline : ' + String(counters.single));
-      log('             multiline : ' + String(counters.block));
+      log('           single-line : ' + String(counters.single));
+      log('                 block : ' + String(counters.block));
+      log('                 mixed : ' + String(counters.mixed));
       log('                 empty : ' + colors.red(String(counters.empty)));
       log('');
       log('  number of files read : ' + colors.green(String(counters.file)));
