@@ -4,17 +4,16 @@ var path = require('path');
 var util = require('util');
 
 var _ = require('lodash');
+var colors = require('ansi-colors');
 var expect = require('expect.js');
-var gutil = require('gulp-util');
+var Vinyl = require('vinyl');
 
-var File = gutil.File;
-var colors = gutil.colors;
 var interceptStdout = require('./intercept_stdout');
 
 var sloc = require('../');
 
 function makeFakeFile(filePath, contents) {
-  return new File({
+  return new Vinyl({
     cwd: path.dirname(path.dirname(filePath)),
     base: path.dirname(path.dirname(filePath)),
     path: filePath,

@@ -3,14 +3,14 @@
 var path = require('path');
 var _ = require('lodash');
 var es = require('event-stream');
-var gutil = require('gulp-util');
+var colors = require('ansi-colors');
+var log = require('fancy-log');
 var sloc = require('sloc');
+var PluginError = require('plugin-error');
+var Vinyl = require('vinyl');
 
 function gulpSloc(options) {
   var supportedExtensions = sloc.extensions;
-  var log = gutil.log;
-  var colors = gutil.colors;
-  var File = gutil.File;
 
   options = _.extend({
     tolerant: false,
@@ -26,7 +26,7 @@ function gulpSloc(options) {
   }, options.reportElements);  
 
   if (options.reportType === 'json' && _.isEmpty(options.reportFile)) {
-    throw new gutil.PluginError('gulp-sloc', 'Invalid report file. Provide a valid file name for reportFile in options.');
+    throw new PluginError('gulp-sloc', 'Invalid report file. Provide a valid file name for reportFile in options.');
   }
 
   return (function () {
@@ -37,7 +37,7 @@ function gulpSloc(options) {
       counters = _.pick(counters, options.metrics);
       /*jshint validthis: true*/
 
-      var reportFile = new File({
+      var reportFile = new Vinyl({
         path: options.reportFile,
         contents: new Buffer(JSON.stringify(counters))
       });
